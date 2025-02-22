@@ -97,8 +97,8 @@ const std::array<GLfloat, 8> VERTICES{ -1.0f, -1.0f,
                                         1.0f, -1.0f };
 const std::array<GLuint, 6> INDICES{ 0, 1, 2, 0, 2, 3 };
 
-constexpr float C_MAX{ 2.0f * std::numbers::pi_v<float> };
-constexpr float C_MIN{ 0 };
+constexpr float A_MAX{ 2.0f * std::numbers::pi_v<float> };
+constexpr float A_MIN{ 0 };
 constexpr float ANIMATION_SPEED{ 5.0f };
 
 int main() {
@@ -181,9 +181,8 @@ int main() {
   auto desired_zoom = 1.0f;
   auto offset_x = 0.0f;
   auto offset_y = 0.0f;
-  auto c_x = C_MIN;
-  auto c_y = C_MIN;
-  auto c_factor = -0.01f * ANIMATION_SPEED;
+  auto a = A_MIN;
+  auto a_factor = -0.01f * ANIMATION_SPEED;
   auto controls = std::array<bool, 6>{ false, false, false, false, false, false };
   auto& [ up, down, left, right, escape, pause ] = controls;
   auto paused = false;
@@ -217,18 +216,17 @@ int main() {
     GL_ERR_CHECK(glUniform1ui(2, 1000));
     GL_ERR_CHECK(glUniform1f(3, zoom));
     GL_ERR_CHECK(glUniform2f(4, offset_x, offset_y));
-    GL_ERR_CHECK(glUniform2f(5, 0.7885f * std::cos(c_x), 0.7885f * std::sin(c_y)));
+    GL_ERR_CHECK(glUniform2f(5, 0.7885f * std::cos(a), 0.7885f * std::sin(a)));
     GL_ERR_CHECK(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
     SDL_GL_SwapWindow(win);
     // Update world
     if (!paused)
     {
-      if ((c_x <= C_MIN && c_y <= C_MIN) || (c_x >= C_MAX && c_y >= C_MAX))
+      if (a <= A_MIN || a >= A_MAX)
       {
-        c_factor *= -1.0f;
+        a_factor *= -1.0f;
       }
-      c_x += c_factor * dt.count();
-      c_y += c_factor * dt.count();
+      a += a_factor * dt.count();
     }
     // Handle Input
     while (SDL_PollEvent(&ev))
